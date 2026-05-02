@@ -3,393 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PH en Venta – Ruta de visitas</title>
+<title>PH en Venta – Votá tu favorito</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f5f5f5; padding: 24px; }
-  h1 { font-size: 1.4rem; margin-bottom: 20px; color: #222; }
+  header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  h1 { font-size: 1.3rem; color: #222; }
+  .sort-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sort-btns button { padding: 7px 14px; border: 2px solid #1a1aff; border-radius: 20px; background: #fff; color: #1a1aff; font-weight: 600; font-size: .82rem; cursor: pointer; transition: all .15s; }
+  .sort-btns button.active { background: #1a1aff; color: #fff; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-  .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.12); display: flex; flex-direction: column; }
+  .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.12); display: flex; flex-direction: column; position: relative; transition: box-shadow .2s; }
+  .card.my-vote { box-shadow: 0 0 0 3px #1a1aff, 0 2px 8px rgba(0,0,0,.15); }
   .card img { width: 100%; height: 200px; object-fit: cover; }
   .info { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-  h3 { font-size: .92rem; color: #111; line-height: 1.3; }
+  h3 { font-size: .9rem; color: #111; line-height: 1.3; }
   .addr { font-size: .82rem; color: #555; }
-  .num { position: absolute; background: #1a1aff; color: #fff; font-weight: 700; font-size: .85rem; padding: 4px 9px; border-radius: 0 0 8px 0; }
-  .card { position: relative; }
-  .links { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat { font-size: .82rem; font-weight: 600; padding: 3px 8px; border-radius: 5px; }
+  .stat.price { background: #fff3cd; color: #856404; }
+  .stat.sqm   { background: #d1ecf1; color: #0c5460; }
+  .stat.rooms { background: #d4edda; color: #155724; }
+  .num { position: absolute; top: 0; left: 0; background: #1a1aff; color: #fff; font-weight: 700; font-size: .85rem; padding: 4px 9px; border-radius: 0 0 8px 0; z-index: 1; }
+  .rank-badge { position: absolute; top: 0; right: 0; font-size: 1.3rem; padding: 4px 8px; border-radius: 0 10px 0 8px; display: none; }
+  .rank-badge.show { display: block; }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; }
   .links a { font-size: .78rem; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-weight: 500; }
   .links a:nth-child(1) { background: #ffe600; color: #333; }
   .links a:nth-child(2) { background: #34a853; color: #fff; }
   .links a:nth-child(3) { background: #4285f4; color: #fff; }
+  .vote-row { margin-top: auto; display: flex; align-items: center; gap: 10px; }
+  .vote-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 20px; border: 2px solid #ddd; background: #fff; cursor: pointer; font-size: .88rem; font-weight: 600; color: #555; transition: all .15s; }
+  .vote-btn:hover { border-color: #1a1aff; color: #1a1aff; }
+  .vote-btn.voted { background: #1a1aff; border-color: #1a1aff; color: #fff; }
+  .vote-count { font-size: .82rem; color: #888; }
 </style>
 </head>
 <body>
-<h1>PH en Venta — 28 propiedades · Ruta optimizada</h1>
-<div class="grid">
-  <div class="card">
-    <div class="num">1</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_928163-MLA109384875882_042026-V.webp" alt="Venta Ph 5 Ambientes Villa Urquiza Terraza Pileta" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 5 Ambientes Villa Urquiza Terraza Pileta</h3>
-      <p class="addr">📍 Nahuel Huapi 4700, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3170163358-venta-ph-5-ambientes-villa-urquiza-terraza-pileta-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56884,-58.48417" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56884,-58.48417" target="_blank">Street View</a>
-      </div>
-    </div>
+
+<header>
+  <h1>PH en Venta — 28 propiedades</h1>
+  <div class="sort-btns">
+    <button id="btnRoute"  class="active" onclick="setSort('route')">📍 Ruta</button>
+    <button id="btnVotes"  onclick="setSort('votes')">⭐ Votos</button>
+    <button id="btnPrice"  onclick="setSort('price')">💲 Precio</button>
+    <button id="btnSqm"    onclick="setSort('sqm')">📐 m²</button>
   </div>
-  <div class="card">
-    <div class="num">2</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_709756-MLA109123666409_032026-V.webp" alt="Venta Ph 4 Ambientes Con Terraza Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 4 Ambientes Con Terraza Villa Urquiza</h3>
-      <p class="addr">📍 Galván 2800, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3079562020-venta-ph-4-ambientes-con-terraza-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56954,-58.48524" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56954,-58.48524" target="_blank">Street View</a>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyAq6boBsG_rwwiPkSDrsrHDOrfnuyk0rZQ",
+  authDomain: "ph-real.firebaseapp.com",
+  databaseURL: "https://ph-real-default-rtdb.firebaseio.com",
+  projectId: "ph-real",
+  storageBucket: "ph-real.firebasestorage.app",
+  messagingSenderId: "110072682929",
+  appId: "1:110072682929:web:d88ec4e532c4f36985c590"
+});
+const db = firebase.database();
+const votesRef = db.ref("votes");
+
+const LISTINGS = [
+  { id:"MLA-3170163358", n:1,  price:250000, sqm:102, rooms:5, title:"Venta Ph 5 Ambientes Villa Urquiza Terraza Pileta",                        address:"Nahuel Huapi 4700, Villa Urquiza",    img:"https://http2.mlstatic.com/D_NQ_NP_2X_928163-MLA109384875882_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3170163358-venta-ph-5-ambientes-villa-urquiza-terraza-pileta-_JM",                                                                lat:-34.56884, lon:-58.48417 },
+  { id:"MLA-3079562020", n:2,  price:220000, sqm:104, rooms:4, title:"Venta Ph 4 Ambientes Con Terraza Villa Urquiza",                           address:"Galván 2800, Villa Urquiza",          img:"https://http2.mlstatic.com/D_NQ_NP_2X_709756-MLA109123666409_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3079562020-venta-ph-4-ambientes-con-terraza-villa-urquiza-_JM",                                                                 lat:-34.56954, lon:-58.48524 },
+  { id:"MLA-1765389539", n:3,  price:289000, sqm:127, rooms:5, title:"Venta Ph 5 Ambientes Terraza Garage Villa Urquiza",                        address:"Tomás Le Bretón 4700, Villa Urquiza", img:"https://http2.mlstatic.com/D_NQ_NP_2X_612615-MLA110923500683_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-1765389539-venta-ph-5-ambientes-terraza-garage-villa-urquiza-_JM",                                                              lat:-34.56789, lon:-58.48496 },
+  { id:"MLA-3131839588", n:4,  price:240000, sqm:115, rooms:5, title:"Venta Ph 5 Ambientes Terraza Balcón Luminoso Villa Urquiza",              address:"Quesada 4785, Villa Urquiza",         img:"https://http2.mlstatic.com/D_NQ_NP_2X_918830-MLA109924547957_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3131839588-venta-ph-5-ambientes-terraza-balcon-luminoso-villa-urquiza-_JM",                                                     lat:-34.56629, lon:-58.48631 },
+  { id:"MLA-3251231780", n:5,  price:225000, sqm:129, rooms:4, title:"Venta Ph 4/5 Amb Patio Quincho Terraza V. Urquiza",                       address:"Lugones 3200, Villa Urquiza",         img:"https://http2.mlstatic.com/D_NQ_NP_2X_617664-MLA111049258139_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3251231780-venta-ph-45-amb-patio-quincho-terraza-v-urquiza-_JM",                                                                lat:-34.56467, lon:-58.48541 },
+  { id:"MLA-2419589958", n:6,  price:199500, sqm:90,  rooms:6, title:"Ph 6 Amb Cfte Con Terraza. Sin Expensas",                                 address:"Ibera 4937, Villa Urquiza",           img:"https://http2.mlstatic.com/D_NQ_NP_2X_607753-MLA93805306416_102025-V.webp",   url:"https://inmueble.mercadolibre.com.ar/MLA-2419589958-ph-6-amb-cfte-con-terraza-sin-expensas-_JM",                                                                         lat:-34.56600, lon:-58.48887 },
+  { id:"MLA-3250205216", n:7,  price:218000, sqm:122, rooms:4, title:"Venta De Ph 4 Ambientes Con Patio Y Terraza En Villa Urquiza",            address:"Pacheco 3300, Villa Urquiza",         img:"https://http2.mlstatic.com/D_NQ_NP_2X_756125-MLA111041109297_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3250205216-venta-de-ph-4-ambientes-con-patio-y-terraza-en-villa-urquiza-_JM",                                                   lat:-34.56548, lon:-58.49037 },
+  { id:"MLA-3101186676", n:8,  price:299000, sqm:117, rooms:4, title:"Venta Ph 4 Ambientes Con Terraza Propia Coghlan Apto Credito",            address:"Plaza 3200, Coghlan",                 img:"https://http2.mlstatic.com/D_NQ_NP_2X_934400-MLA108661986064_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3101186676-venta-ph-4-ambientes-con-terraza-propia-coghlan-apto-credito-_JM",                                                   lat:-34.55917, lon:-58.48331 },
+  { id:"MLA-2116901836", n:9,  price:165000, sqm:104, rooms:5, title:"Venta Ph 4 Ambientes Sin Expensas Terraza Saavedra",                      address:"Melián 3500, Saavedra",               img:"https://http2.mlstatic.com/D_NQ_NP_2X_896919-MLA86090109043_062025-V.webp",   url:"https://inmueble.mercadolibre.com.ar/MLA-2116901836-venta-ph-4-ambientes-sin-expensas-terraza-saavedra-_JM",                                                             lat:-34.55495, lon:-58.47997 },
+  { id:"MLA-3254468016", n:10, price:285000, sqm:125, rooms:4, title:"Venta Ph 4 Ambientes En Saavedra",                                        address:"Superí 3500, Saavedra",               img:"https://http2.mlstatic.com/D_NQ_NP_2X_626786-MLA111076633311_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3254468016-venta-ph-4-ambientes-en-saavedra-_JM",                                                                               lat:-34.55557, lon:-58.47700 },
+  { id:"MLA-2108667558", n:11, price:269000, sqm:130, rooms:6, title:"Espectac Ph C/entr Indep 4 Dorm Reciclado Playroom/Qcho Parr Garage",     address:"Roque Pérez 3100, Núñez",             img:"https://http2.mlstatic.com/D_NQ_NP_2X_619257-MLA85619572570_062025-V.webp",   url:"https://inmueble.mercadolibre.com.ar/MLA-2108667558-espectac-ph-centr-indep-4-dorm-reciclado-playrroomqcho-parr-garage-_JM",                                              lat:-34.55960, lon:-58.47527 },
+  { id:"MLA-1759569081", n:12, price:264000, sqm:150, rooms:4, title:"Ph Coghlan Soñado 4 Amb Patio Quincho Terraza",                           address:"Roque Pérez 3000, Coghlan",           img:"https://http2.mlstatic.com/D_NQ_NP_2X_817028-MLA82887061596_032025-V.webp",   url:"https://inmueble.mercadolibre.com.ar/MLA-1759569081-ph-cohglan-sonado-4-amb-patio-quincho-terraza-3er-dormit-_JM",                                                      lat:-34.56051, lon:-58.47459 },
+  { id:"MLA-1744534819", n:13, price:230000, sqm:150, rooms:7, title:"Venta 2 Ph Independientes En Block - 4amb + 2amb",                        address:"Superí 2900, Coghlan",                img:"https://http2.mlstatic.com/D_NQ_NP_2X_607698-MLA110333028673_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-1744534819-venta-2-ph-independientes-en-block-4amb-2amb-_JM",                                                                   lat:-34.56092, lon:-58.47269 },
+  { id:"MLA-1748587807", n:14, price:259000, sqm:115, rooms:5, title:"Ph 5 Ambientes Sin Expensas Terraza Con Parrilla Súper Luminoso",         address:"Estomba 2700, Coghlan",               img:"https://http2.mlstatic.com/D_NQ_NP_2X_629008-MLA110422846955_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-1748587807-ph-5-ambientes-sin-expensas-terraza-con-parrilla-super-luminoso-excelente-estado-piso-unico-_JM",                     lat:-34.56545, lon:-58.47616 },
+  { id:"MLA-1695039949", n:15, price:249000, sqm:192, rooms:9, title:"Gran Ph En Villa Urquiza",                                                address:"Mariano Acha 2500, Villa Urquiza",    img:"https://http2.mlstatic.com/D_NQ_NP_2X_955102-MLA108375756593_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-1695039949-gran-ph-en-villa-urquiza-_JM",                                                                                       lat:-34.57020, lon:-58.47902 },
+  { id:"MLA-2261364280", n:16, price:290000, sqm:159, rooms:4, title:"Ph 4 Ambientes Venta Villa Urquiza",                                      address:"Juramento 4800, Villa Urquiza",       img:"https://http2.mlstatic.com/D_NQ_NP_2X_980284-MLA85063320265_052025-V.webp",   url:"https://inmueble.mercadolibre.com.ar/MLA-2261364280-ph-4-ambientes-venta-villa-urquiza-_JM",                                                                              lat:-34.57528, lon:-58.47926 },
+  { id:"MLA-2912098690", n:17, price:298000, sqm:145, rooms:6, title:"Ph En Villa Urquiza",                                                     address:"Donado 1900, Villa Urquiza",          img:"https://http2.mlstatic.com/D_NQ_NP_2X_846403-MLA107817117909_022026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-2912098690-ph-en-villa-urquiza-_JM",                                                                                             lat:-34.57480, lon:-58.47352 },
+  { id:"MLA-2999183390", n:18, price:265000, sqm:108, rooms:3, title:"Ph En Belgrano R",                                                        address:"Estomba 2000, Belgrano R",            img:"https://http2.mlstatic.com/D_NQ_NP_2X_976689-MLA107326973096_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-2999183390-ph-en-belgrano-r-_JM",                                                                                               lat:-34.57185, lon:-58.47056 },
+  { id:"MLA-1723913429", n:19, price:290000, sqm:110, rooms:4, title:"Ph 4 Ambientes En Venta En Belgrano R",                                   address:"Holmberg 1600, Belgrano R",           img:"https://http2.mlstatic.com/D_NQ_NP_2X_632854-MLA109630257867_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-1723913429-ph-4-ambientes-en-venta-en-belgrano-r-_JM",                                                                         lat:-34.57749, lon:-58.46983 },
+  { id:"MLA-2810580974", n:20, price:189900, sqm:113, rooms:4, title:"Departamento En Belgrano",                                                address:"Vidal 2400, Belgrano",                img:"https://http2.mlstatic.com/D_NQ_NP_2X_886224-MLA105323910210_012026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-2810580974-departamento-en-belgrano-_JM",                                                                                       lat:-34.56150, lon:-58.46276 },
+  { id:"MLA-1560152765", n:21, price:260000, sqm:119, rooms:4, title:"Venta Amplio Ph 4 Ambientes En Dos Plantas Con Terraza Belgrano",         address:"Cuba 4000, Belgrano",                 img:"https://http2.mlstatic.com/D_NQ_NP_2X_888827-MLA95038626520_102025-V.webp",   url:"https://inmueble.mercadolibre.com.ar/MLA-1560152765-venta-amplio-ph-4-ambientes-en-dos-plantas-con-terraza-belgrano-_JM",                                                lat:-34.56278, lon:-58.45314 },
+  { id:"MLA-3202028336", n:22, price:298000, sqm:126, rooms:5, title:"Venta Ph Tipo Casa En Belgrano 4 Amb Playroom Terraza Con Parrilla",      address:"Quesada 2100, Belgrano",              img:"https://http2.mlstatic.com/D_NQ_NP_2X_933387-MLA110533908177_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3202028336-venta-ph-tipo-casa-en-belgrano-171-m-45-m-descubiertos-4-amb-playroom-terraza-con-parrilla-_JM",                     lat:-34.55391, lon:-58.45930 },
+  { id:"MLA-3108640056", n:23, price:185000, sqm:75,  rooms:4, title:"Ph - Venta - Núñez, Con Gran Potencial Y Múltiples Espacios",            address:"Quesada 2100, Núñez",                 img:"https://http2.mlstatic.com/D_NQ_NP_2X_699101-MLA109566745713_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3108640056-ph-venta-nunez-con-gran-potencial-y-multiples-espacios-_JM",                                                        lat:-34.55391, lon:-58.45930 },
+  { id:"MLA-3025462632", n:24, price:215000, sqm:118, rooms:6, title:"Venta Ph Reciclar 6 Ambientes Apto Crédito Núñez",                       address:"Av. Núñez 2600, Núñez",               img:"https://http2.mlstatic.com/D_NQ_NP_2X_951063-MLA107752821708_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3025462632-venta-ph-reciclar-6-ambientes-apto-credito-dependencia-2-patios-lavadero-nunez-_JM",                                 lat:-34.55036, lon:-58.45341 },
+  { id:"MLA-3029850974", n:25, price:198000, sqm:205, rooms:4, title:"Ph En Nuñez En Venta",                                                    address:"O'Higgins 3900, Núñez",               img:"https://http2.mlstatic.com/D_NQ_NP_2X_621861-MLA108426598171_032026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3029850974-ph-en-nunez-en-venta-_JM",                                                                                           lat:-34.54481, lon:-58.46594 },
+  { id:"MLA-3078936712", n:26, price:215000, sqm:100, rooms:4, title:"Venta Hermoso Ph 4 Ambientes Reciclado 100m2 Sin Expensas",              address:"Paroissien 2300, Núñez",              img:"https://http2.mlstatic.com/D_NQ_NP_2X_863356-MLA110127253618_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3078936712-venta-hermoso-ph-4-ambientes-reciclado-100m2-sin-expensas-_JM",                                                     lat:-34.54610, lon:-58.46857 },
+  { id:"MLA-3165224836", n:27, price:279900, sqm:122, rooms:5, title:"Venta Ph De 5 Ambientes En Saavedra Sin Expensas",                       address:"Av. Cabildo 3700, Saavedra",          img:"https://http2.mlstatic.com/D_NQ_NP_2X_837095-MLA109329957386_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-3165224836-venta-ph-de-5-ambientes-en-saavedra-sin-expensas-_JM",                                                              lat:-34.54114, lon:-58.47420 },
+  { id:"MLA-1768314947", n:28, price:225000, sqm:79,  rooms:4, title:"Ph 4 Amb Balcon Patio Y Terraza Propia",                                 address:"Nahuel Huapi 5500, Villa Urquiza",    img:"https://http2.mlstatic.com/D_NQ_NP_2X_720754-MLA110086668004_042026-V.webp",  url:"https://inmueble.mercadolibre.com.ar/MLA-1768314947-ph-4-amb-balcon-patio-y-terraza-propia-_JM",                                                                         lat:-34.57379, lon:-58.49328 },
+];
+
+let votes = {};
+let currentSort = 'route';
+
+function fmtPrice(p) {
+  return 'US$' + p.toLocaleString('es-AR');
+}
+
+function renderGrid() {
+  const myVote = localStorage.getItem('myVote');
+  const sorted = [...LISTINGS];
+  if (currentSort === 'votes') sorted.sort((a,b) => (votes[b.id]||0) - (votes[a.id]||0));
+  if (currentSort === 'price') sorted.sort((a,b) => a.price - b.price);
+  if (currentSort === 'sqm')   sorted.sort((a,b) => b.sqm - a.sqm);
+
+  document.getElementById('grid').innerHTML = sorted.map((l, idx) => {
+    const count    = votes[l.id] || 0;
+    const isMyVote = myVote === l.id;
+    const medals   = ['🥇','🥈','🥉'];
+    const showMedal = currentSort === 'votes' && idx < 3 && count > 0;
+    return `
+    <div class="card${isMyVote ? ' my-vote' : ''}">
+      <div class="num">${l.n}</div>
+      ${showMedal ? `<div class="rank-badge show">${medals[idx]}</div>` : ''}
+      <img src="${l.img}" alt="${l.title}" loading="lazy">
+      <div class="info">
+        <h3>${l.title}</h3>
+        <p class="addr">📍 ${l.address}</p>
+        <div class="stats">
+          <span class="stat price">${fmtPrice(l.price)}</span>
+          <span class="stat sqm">${l.sqm} m²</span>
+          <span class="stat rooms">${l.rooms} amb.</span>
+        </div>
+        <div class="links">
+          <a href="${l.url}" target="_blank">MercadoLibre</a>
+          <a href="https://www.google.com/maps?q=${l.lat},${l.lon}" target="_blank">Maps</a>
+          <a href="https://maps.google.com/maps?q=&layer=c&cbll=${l.lat},${l.lon}" target="_blank">Street View</a>
+        </div>
+        <div class="vote-row">
+          <button class="vote-btn${isMyVote ? ' voted' : ''}" onclick="castVote('${l.id}')">
+            ${isMyVote ? '⭐ Mi voto' : '☆ Votar'}
+          </button>
+          <span class="vote-count">${count} ${count === 1 ? 'voto' : 'votos'}</span>
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">3</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_612615-MLA110923500683_042026-V.webp" alt="Venta Ph 5 Ambientes Terraza Garage Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 5 Ambientes Terraza Garage Villa Urquiza</h3>
-      <p class="addr">📍 Tomás Le Bretón 4700, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1765389539-venta-ph-5-ambientes-terraza-garage-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56789,-58.48496" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56789,-58.48496" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">4</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_918830-MLA109924547957_042026-V.webp" alt="Venta Ph 5 Ambientes Terraza Balcón Luminoso Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 5 Ambientes Terraza Balcón Luminoso Villa Urquiza</h3>
-      <p class="addr">📍 Quesada 4785, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3131839588-venta-ph-5-ambientes-terraza-balcon-luminoso-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56629,-58.48631" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56629,-58.48631" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">5</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_617664-MLA111049258139_042026-V.webp" alt="Venta Ph 4/5 Amb Patio Quincho Terraza V. Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 4/5 Amb Patio Quincho Terraza V. Urquiza</h3>
-      <p class="addr">📍 Lugones 3200, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3251231780-venta-ph-45-amb-patio-quincho-terraza-v-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56467,-58.48541" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56467,-58.48541" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">6</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_607753-MLA93805306416_102025-V.webp" alt="Ph 6 Amb Cfte Con Terraza. Sin Expensas" loading="lazy">
-    <div class="info">
-      <h3>Ph 6 Amb Cfte Con Terraza. Sin Expensas</h3>
-      <p class="addr">📍 Ibera 4937, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2419589958-ph-6-amb-cfte-con-terraza-sin-expensas-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.566,-58.48887" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.566,-58.48887" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">7</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_756125-MLA111041109297_042026-V.webp" alt="Venta De Ph 4 Ambientes Con Patio Y Terraza En Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Venta De Ph 4 Ambientes Con Patio Y Terraza En Villa Urquiza</h3>
-      <p class="addr">📍 Pacheco 3300, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3250205216-venta-de-ph-4-ambientes-con-patio-y-terraza-en-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56548,-58.49037" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56548,-58.49037" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">8</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_934400-MLA108661986064_032026-V.webp" alt="Venta Ph 4 Ambientes Con Terraza Propia Coghlan Apto Credito" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 4 Ambientes Con Terraza Propia Coghlan Apto Credito</h3>
-      <p class="addr">📍 Plaza 3200, Coghlan</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3101186676-venta-ph-4-ambientes-con-terraza-propia-coghlan-apto-credito-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.55917,-58.48331" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.55917,-58.48331" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">9</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_896919-MLA86090109043_062025-V.webp" alt="Venta Ph 4 Ambientes Sin Expensas Terraza Saavedra" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 4 Ambientes Sin Expensas Terraza Saavedra</h3>
-      <p class="addr">📍 Melián 3500, Saavedra</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2116901836-venta-ph-4-ambientes-sin-expensas-terraza-saavedra-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.55495,-58.47997" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.55495,-58.47997" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">10</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_626786-MLA111076633311_042026-V.webp" alt="Venta Ph 4 Ambientes En Saavedra" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph 4 Ambientes En Saavedra</h3>
-      <p class="addr">📍 Superí 3500, Saavedra</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3254468016-venta-ph-4-ambientes-en-saavedra-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.55557,-58.477" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.55557,-58.477" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">11</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_619257-MLA85619572570_062025-V.webp" alt="Espectac Ph C/entr Indep 4 Dorm Reciclado Playroom/Qcho Parr Garage" loading="lazy">
-    <div class="info">
-      <h3>Espectac Ph C/entr Indep 4 Dorm Reciclado Playroom/Qcho Parr Garage</h3>
-      <p class="addr">📍 Roque Pérez 3100, Núñez</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2108667558-espectac-ph-centr-indep-4-dorm-reciclado-playrroomqcho-parr-garage-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.5596,-58.47527" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.5596,-58.47527" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">12</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_817028-MLA82887061596_032025-V.webp" alt="Ph Coghlan Soñado 4 Amb Patio Quincho Terraza" loading="lazy">
-    <div class="info">
-      <h3>Ph Coghlan Soñado 4 Amb Patio Quincho Terraza</h3>
-      <p class="addr">📍 Roque Pérez 3000, Coghlan</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1759569081-ph-cohglan-sonado-4-amb-patio-quincho-terraza-3er-dormit-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56051,-58.47459" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56051,-58.47459" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">13</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_607698-MLA110333028673_042026-V.webp" alt="Venta 2 Ph Independientes En Block - 4amb + 2amb" loading="lazy">
-    <div class="info">
-      <h3>Venta 2 Ph Independientes En Block - 4amb + 2amb</h3>
-      <p class="addr">📍 Superí 2900, Coghlan</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1744534819-venta-2-ph-independientes-en-block-4amb-2amb-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56092,-58.47269" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56092,-58.47269" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">14</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_629008-MLA110422846955_042026-V.webp" alt="Ph 5 Ambientes Sin Expensas Terraza Con Parrilla Súper Luminoso" loading="lazy">
-    <div class="info">
-      <h3>Ph 5 Ambientes Sin Expensas Terraza Con Parrilla Súper Luminoso</h3>
-      <p class="addr">📍 Estomba 2700, Coghlan</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1748587807-ph-5-ambientes-sin-expensas-terraza-con-parrilla-super-luminoso-excelente-estado-piso-unico-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56545,-58.47616" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56545,-58.47616" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">15</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_955102-MLA108375756593_032026-V.webp" alt="Gran Ph En Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Gran Ph En Villa Urquiza</h3>
-      <p class="addr">📍 Mariano Acha 2500, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1695039949-gran-ph-en-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.5702,-58.47902" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.5702,-58.47902" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">16</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_980284-MLA85063320265_052025-V.webp" alt="Ph 4 Ambientes Venta Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Ph 4 Ambientes Venta Villa Urquiza</h3>
-      <p class="addr">📍 Juramento 4800, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2261364280-ph-4-ambientes-venta-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.57528,-58.47926" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.57528,-58.47926" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">17</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_846403-MLA107817117909_022026-V.webp" alt="Ph En Villa Urquiza" loading="lazy">
-    <div class="info">
-      <h3>Ph En Villa Urquiza</h3>
-      <p class="addr">📍 Donado 1900, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2912098690-ph-en-villa-urquiza-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.5748,-58.47352" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.5748,-58.47352" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">18</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_976689-MLA107326973096_032026-V.webp" alt="Ph En Belgrano R" loading="lazy">
-    <div class="info">
-      <h3>Ph En Belgrano R</h3>
-      <p class="addr">📍 Estomba 2000, Belgrano R</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2999183390-ph-en-belgrano-r-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.57185,-58.47056" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.57185,-58.47056" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">19</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_632854-MLA109630257867_032026-V.webp" alt="Ph 4 Ambientes En Venta En Belgrano R" loading="lazy">
-    <div class="info">
-      <h3>Ph 4 Ambientes En Venta En Belgrano R</h3>
-      <p class="addr">📍 Holmberg 1600, Belgrano R</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1723913429-ph-4-ambientes-en-venta-en-belgrano-r-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.57749,-58.46983" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.57749,-58.46983" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">20</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_886224-MLA105323910210_012026-V.webp" alt="Departamento En Belgrano" loading="lazy">
-    <div class="info">
-      <h3>Departamento En Belgrano</h3>
-      <p class="addr">📍 Vidal 2400, Belgrano</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-2810580974-departamento-en-belgrano-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.5615,-58.46276" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.5615,-58.46276" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">21</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_888827-MLA95038626520_102025-V.webp" alt="Venta Amplio Ph 4 Ambientes En Dos Plantas Con Terraza Belgrano" loading="lazy">
-    <div class="info">
-      <h3>Venta Amplio Ph 4 Ambientes En Dos Plantas Con Terraza Belgrano</h3>
-      <p class="addr">📍 Cuba 4000, Belgrano</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1560152765-venta-amplio-ph-4-ambientes-en-dos-plantas-con-terraza-belgrano-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.56278,-58.45314" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.56278,-58.45314" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">22</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_933387-MLA110533908177_042026-V.webp" alt="Venta Ph Tipo Casa En Belgrano 4 Amb Playroom Terraza Con Parrilla" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph Tipo Casa En Belgrano 4 Amb Playroom Terraza Con Parrilla</h3>
-      <p class="addr">📍 Quesada 2100, Belgrano</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3202028336-venta-ph-tipo-casa-en-belgrano-171-m-45-m-descubiertos-4-amb-playroom-terraza-con-parrilla-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.5539128,-58.4592964" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.5539128,-58.4592964" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">23</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_699101-MLA109566745713_032026-V.webp" alt="Ph - Venta - Núñez, Con Gran Potencial Y Múltiples Espacios" loading="lazy">
-    <div class="info">
-      <h3>Ph - Venta - Núñez, Con Gran Potencial Y Múltiples Espacios</h3>
-      <p class="addr">📍 Quesada 2100, Núñez</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3108640056-ph-venta-nunez-con-gran-potencial-y-multiples-espacios-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.55391,-58.4593" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.55391,-58.4593" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">24</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_951063-MLA107752821708_032026-V.webp" alt="Venta Ph Reciclar 6 Ambientes Apto Crédito Núñez" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph Reciclar 6 Ambientes Apto Crédito Núñez</h3>
-      <p class="addr">📍 Av. Núñez 2600, Núñez</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3025462632-venta-ph-reciclar-6-ambientes-apto-credito-dependencia-2-patios-lavadero-nunez-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.55036,-58.45341" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.55036,-58.45341" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">25</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_621861-MLA108426598171_032026-V.webp" alt="Ph En Nuñez En Venta" loading="lazy">
-    <div class="info">
-      <h3>Ph En Nuñez En Venta</h3>
-      <p class="addr">📍 O'Higgins 3900, Núñez</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3029850974-ph-en-nunez-en-venta-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.54481,-58.46594" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.54481,-58.46594" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">26</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_863356-MLA110127253618_042026-V.webp" alt="Venta Hermoso Ph 4 Ambientes Reciclado 100m2 Sin Expensas" loading="lazy">
-    <div class="info">
-      <h3>Venta Hermoso Ph 4 Ambientes Reciclado 100m2 Sin Expensas</h3>
-      <p class="addr">📍 Paroissien 2300, Núñez</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3078936712-venta-hermoso-ph-4-ambientes-reciclado-100m2-sin-expensas-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.5461,-58.46857" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.5461,-58.46857" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">27</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_837095-MLA109329957386_042026-V.webp" alt="Venta Ph De 5 Ambientes En Saavedra Sin Expensas" loading="lazy">
-    <div class="info">
-      <h3>Venta Ph De 5 Ambientes En Saavedra Sin Expensas</h3>
-      <p class="addr">📍 Av. Cabildo 3700, Saavedra</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-3165224836-venta-ph-de-5-ambientes-en-saavedra-sin-expensas-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.54114,-58.4742" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.54114,-58.4742" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="num">28</div>
-    <img src="https://http2.mlstatic.com/D_NQ_NP_2X_720754-MLA110086668004_042026-V.webp" alt="Ph 4 Amb Balcon Patio Y Terraza Propia" loading="lazy">
-    <div class="info">
-      <h3>Ph 4 Amb Balcon Patio Y Terraza Propia</h3>
-      <p class="addr">📍 Nahuel Huapi 5500, Villa Urquiza</p>
-      <div class="links">
-        <a href="https://inmueble.mercadolibre.com.ar/MLA-1768314947-ph-4-amb-balcon-patio-y-terraza-propia-_JM" target="_blank">Ver en MercadoLibre</a>
-        <a href="https://www.google.com/maps?q=-34.57379,-58.49328" target="_blank">Google Maps</a>
-        <a href="https://maps.google.com/maps?q=&layer=c&cbll=-34.57379,-58.49328" target="_blank">Street View</a>
-      </div>
-    </div>
-  </div>
-</div>
+    </div>`;
+  }).join('');
+}
+
+function castVote(id) {
+  const prev = localStorage.getItem('myVote');
+  if (prev === id) return;
+  const updates = {};
+  if (prev) updates[`votes/${prev}`] = Math.max(0, (votes[prev]||0) - 1);
+  updates[`votes/${id}`] = (votes[id]||0) + 1;
+  db.ref().update(updates);
+  localStorage.setItem('myVote', id);
+}
+
+function setSort(mode) {
+  currentSort = mode;
+  ['Route','Votes','Price','Sqm'].forEach(s =>
+    document.getElementById('btn'+s).classList.toggle('active', mode === s.toLowerCase())
+  );
+  renderGrid();
+}
+
+votesRef.on('value', snap => {
+  votes = snap.val() || {};
+  renderGrid();
+});
+</script>
 </body>
 </html>
