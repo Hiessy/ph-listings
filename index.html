@@ -106,8 +106,12 @@ function fmtPrice(p) {
   return 'US$' + p.toLocaleString('es-AR');
 }
 
+function myVotes() {
+  return JSON.parse(localStorage.getItem('myVotes') || '[]');
+}
+
 function renderGrid() {
-  const myVote = localStorage.getItem('myVote');
+  const voted = myVotes();
   const sorted = [...LISTINGS];
   if (currentSort === 'votes') sorted.sort((a,b) => (votes[b.id]||0) - (votes[a.id]||0));
   if (currentSort === 'price') sorted.sort((a,b) => a.price - b.price);
@@ -115,7 +119,7 @@ function renderGrid() {
 
   document.getElementById('grid').innerHTML = sorted.map((l, idx) => {
     const count    = votes[l.id] || 0;
-    const isMyVote = myVote === l.id;
+    const isMyVote = voted.includes(l.id);
     const medals   = ['🥇','🥈','🥉'];
     const showMedal = currentSort === 'votes' && idx < 3 && count > 0;
     return `
@@ -148,13 +152,17 @@ function renderGrid() {
 }
 
 function castVote(id) {
-  const prev = localStorage.getItem('myVote');
-  if (prev === id) return;
+  const voted = myVotes();
+  const already = voted.includes(id);
   const updates = {};
-  if (prev) updates[`votes/${prev}`] = Math.max(0, (votes[prev]||0) - 1);
-  updates[`votes/${id}`] = (votes[id]||0) + 1;
+  if (already) {
+    updates[`votes/${id}`] = Math.max(0, (votes[id]||0) - 1);
+    localStorage.setItem('myVotes', JSON.stringify(voted.filter(v => v !== id)));
+  } else {
+    updates[`votes/${id}`] = (votes[id]||0) + 1;
+    localStorage.setItem('myVotes', JSON.stringify([...voted, id]));
+  }
   db.ref().update(updates);
-  localStorage.setItem('myVote', id);
 }
 
 function setSort(mode) {
