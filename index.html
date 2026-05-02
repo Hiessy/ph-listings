@@ -44,8 +44,8 @@
 <header>
   <h1>PH en Venta — 28 propiedades</h1>
   <div class="sort-btns">
-    <button id="btnRoute"  class="active" onclick="setSort('route')">📍 Ruta</button>
-    <button id="btnVotes"  onclick="setSort('votes')">⭐ Votos</button>
+    <button id="btnRoute"  onclick="setSort('route')">📍 Ruta</button>
+    <button id="btnVotes"  class="active" onclick="setSort('votes')">⭐ Votos</button>
     <button id="btnPrice"  onclick="setSort('price')">💲 Precio</button>
     <button id="btnSqm"    onclick="setSort('sqm')">📐 m²</button>
   </div>
@@ -100,7 +100,7 @@ const LISTINGS = [
 ];
 
 let votes = {};
-let currentSort = 'route';
+let currentSort = 'votes';
 
 function fmtPrice(p) {
   return 'US$' + p.toLocaleString('es-AR');
@@ -165,6 +165,7 @@ function setSort(mode) {
   renderGrid();
 }
 
+renderGrid();
 votesRef.on('value', snap => {
   votes = snap.val() || {};
   renderGrid();
